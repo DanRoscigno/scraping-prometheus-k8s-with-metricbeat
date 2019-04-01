@@ -87,10 +87,10 @@ kubectl get service frontend -w
 Once the external IP address is assigned you can type CTRL-C to stop watching for changes and get the command prompt back (the -w is "watch for changes")
 
 ### Deploy Metricbeat
-Normally deploying Metricbeat would be a single command, but the goal of this example is to show multiple wys of pulling metrics from Prometheus, so we will do things step by step.
+Normally deploying Metricbeat would be a single command, but the goal of this example is to show multiple ways of pulling metrics from Prometheus, so we will do things step by step.
 
 ### Pull data from kube-state-metrics.
-We will look specifically at the events metricset when we build a visualization.  The events metricset exposes information about scaling deployments (among other things) and the reason for the scaling.
+We will look specifically at the kubernetes event metricset when we build a visualization.  The event metricset exposes information about scaling deployments (among other things) and the reason for the scaling.
 
 ```
 kubectl create -f metricbeat-kube-state-metrics.yaml
@@ -107,6 +107,9 @@ kubectl create -f metricbeat-prometheus-auto-discover.yaml
 Let's look at how autodiscover is configured.  Earlier I showed the guestbook.yaml and that annotations were added to the Redis pods.  One of those annotations set prometheus.io/scrape to true, and the other set the port for the Redis metrics to 9121.  In the Metricbeat DaemonSet config we are configuring autodiscover to look for pods with the scrape and port annotations, which is exactly what Prometheus does.  
 ![Metricbeat autodiscover](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/metricbeat-autodiscover-exporters.png)
 I made this autodiscover more abstract by not specifying port 9121, and substituting the value from the annotation provided by the k8s API so that a single autodiscover config could discover all exporters whether they are for Redis or another technology.
+
+If you are not familiar with the Prometheus autodiscover configuration, here is part of an example.  Notice that it uses the same annotations:
+![Promethus autodiscover](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/prometheus-autodiscover-snippet.png)
 
 ### Pull metrics from a Prometheus servers
 In this example we will pull self-monitoring metrics from the Prometheus server, and all of the metrics that Prometheus collects from the various systems being monitored.

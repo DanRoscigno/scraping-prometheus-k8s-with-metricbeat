@@ -25,7 +25,7 @@ data:
               config:
                 - module: prometheus
                   period: 10s
-                  # Redis exporter
+                  # Prometheus exporter host / port
                   hosts: ["${data.host}:${data.kubernetes.annotations.prometheus.io/port}"]
                   metrics_path: /metrics
 
