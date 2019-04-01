@@ -46,7 +46,7 @@ kubectl create secret generic dynamic-logging \
 
 ### Create the cluster role binding for Metricbeat
 ```
-kubectl create -f metricbeat-closterrolebinding.yaml
+kubectl create -f metricbeat-clusterrolebinding.yaml
 ```
 
 ### Check to see if kube-state-metrics is running
