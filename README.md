@@ -98,13 +98,14 @@ In this example we will pull:
 ```
 kubectl create -f metricbeat-kube-state-and-prometheus-server.yaml
 ```
-Here is the YAML to set this up:
+Here is the YAML to connect Metricbeat to the Prometheus server endpoints:
 ![scrape server](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/metricbeat-prometheus-server.png)
 
 We will look specifically at the kubernetes event metricset when we build a visualization.  The event metricset exposes information about scaling deployments (among other things) and the reason for the scaling.
 
 While that deploys, look at the snippet below.  You can see that Metricbeat will connect to port 8080 on the kube-state-metrics pod and collect events and state information about nodes, deployments, etc.
 ![kube-state-metrics YAML](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/kube-state-metrics.png)
+
 ### Pull data from the Prometheus exporter for Redis.
 Up above is a screenshot of the YAML to deploy a sidecar to export Redis metrics.  Metricbeat can pull metrics from Prometheus exporters also.  Deploy a Metricbeat DaemonSet to autodiscover and collect these metrics.
 
