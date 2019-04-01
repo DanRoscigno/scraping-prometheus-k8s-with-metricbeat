@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: metricbeat-deployment-config
+  name: metricbeat-prometheus-server-deployment-config
   namespace: kube-system
   labels:
     k8s-app: metricbeat
@@ -28,7 +28,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: metricbeat-deployment-modules
+  name: metricbeat-prometheus-server-deployment-modules
   namespace: kube-system
   labels:
     k8s-app: metricbeat
@@ -116,9 +116,9 @@ spec:
       - name: config
         configMap:
           defaultMode: 0600
-          name: metricbeat-deployment-config
+          name: metricbeat-prometheus-server-deployment-config
       - name: modules
         configMap:
           defaultMode: 0600
-          name: metricbeat-deployment-modules
+          name: metricbeat-prometheus-server-deployment-modules
 ---
