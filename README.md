@@ -128,7 +128,8 @@ If you are not familiar with the Prometheus autodiscover configuration, here is 
 
 ### View in Kibana
 
-Open your Kibana URL and look under the Dashboard link, verify that the Apache and Redis dashboards are populating.
+#### Open discover
+Look at instantaneous ops per second and ScalingReplicaSet
 
 ### Scale your deployments and see new pods being monitored
 List the existing deployments:
@@ -141,19 +142,19 @@ redis-master   1         1         1            1           3m
 redis-slave    2         2         2            2           3m
 ```
 
-Scale the frontend down to two pods:
+Scale the frontend down to one pod:
 ```
-kubectl scale --replicas=2 deployment/frontend
+kubectl scale --replicas=1 deployment/redis-slave
 
-deployment "frontend" scaled
+deployment "slave" scaled
 ```
 
-Check the frontend deployment:
+Check the slave deployment:
 ```
-kubectl get deployment frontend
+kubectl get slave frontend
 
 NAME       DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
-frontend   2         2         2            2           5m
+slave       1         1         1            1           1m
 ```
 
 ### View the changes in Kibana
