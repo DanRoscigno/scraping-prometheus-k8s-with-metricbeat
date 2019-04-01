@@ -1,12 +1,13 @@
-### Create an Elastic Cloud deployment
-You can use Elastic Cloud ( http://cloud.elastic.co ), or a local deployment.  whichever you choose, https://elastic.co/start will get you started.
+### Create an Elasticsearch Service deployment in Elastic Cloud
+You can use Elastic Cloud ( http://cloud.elastic.co ), or a local deployment.  Whichever you choose, https://elastic.co/start will get you started.
 
-If this is your first experience with the Elastic stack I would recommend Elastic Cloud; and don't worry, you do not need a credit card.
+If this is your first experience with the Elastic Stack I would recommend Elastic Cloud; and don't worry, you do not need a credit card.
 
 Make sure that you take note of the CLOUD ID and Elastic Password if you use Elastic Cloud or Elastic Cloud Enterprise.
 
-### Authorization
-Create a cluster level role binding so that you can manipulate the system level namespace
+### Configure your Kubernetes environment
+#### Authorization
+Create a cluster level role binding so that you can manipulate the system level namespace (this is where DaemonSets go)
 
 ```
 kubectl create clusterrolebinding cluster-admin-binding \
@@ -17,9 +18,9 @@ kubectl create clusterrolebinding cluster-admin-binding \
 Either clone the entire Elastic examples repo or use the wget commands in download.txt:
 
 ```
-mkdir MonitoringKubernetes
-cd MonitoringKubernetes
-wget https://raw.githubusercontent.com/elastic/examples/master/MonitoringKubernetes/download.txt
+mkdir scraping-prometheus-k8s-with-metricbeat
+cd scraping-prometheus-k8s-with-metricbeat
+wget https://raw.githubusercontent.com/elastic/examples/master/scraping-prometheus-k8s-with-metricbeat/download.txt
 sh download.txt
 ```
 
@@ -27,11 +28,12 @@ OR
 
 ```
 git clone https://github.com/elastic/examples.git
-cd examples/MonitoringKubernetes
+cd examples/scraping-prometheus-k8s-with-metricbeat
 ```
 ### Set the credentials
 Set these with the values from the http://cloud.elastic.co deployment
 
+Note: Follow the instructions in the files carefully, the k8s secret creation does not remove trailing whitespace as secrets should be copied exactly as you provide them.
 ```
 vi ELASTIC_PASSWORD
 vi CLOUD_ID
@@ -40,8 +42,8 @@ and create a secret in the Kubernetes system level namespace
 
 ```
 kubectl create secret generic dynamic-logging \
---from-file=./ELASTIC_PASSWORD --from-file=./CLOUD_ID \
---namespace=kube-system
+  --from-file=./ELASTIC_PASSWORD --from-file=./CLOUD_ID \
+  --namespace=kube-system
 ```
 
 ### Create the cluster role binding for Metricbeat
@@ -110,15 +112,15 @@ While that deploys, look at the snippet below.  You can see that Metricbeat will
 ![kube-state-metrics YAML](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/kube-state-metrics.png)
 
 ### Pull data from the Prometheus exporter for Redis.
-Up above is a screenshot of the YAML to deploy a sidecar to export Redis metrics.  Metricbeat can pull metrics from Prometheus exporters also.  Deploy a Metricbeat DaemonSet to autodiscover and collect these metrics.
+Up above is a screenshot of the YAML to deploy a sidecar to export Redis metrics to Preometheus.  Metricbeat can pull metrics from Prometheus exporters also.  Deploy a Metricbeat DaemonSet to autodiscover and collect these metrics.
 
 Note: Normally the Metricbeat DaeomonSet would autodiscover and collect all of the metrics about the k8s environment and the apps running in there, this config is simplified to show just one example.
 ```
 kubectl create -f metricbeat-prometheus-auto-discover.yaml
 ```
-Let's look at how autodiscover is configured.  Earlier I showed the guestbook.yaml and that annotations were added to the Redis pods.  One of those annotations set prometheus.io/scrape to true, and the other set the port for the Redis metrics to 9121.  In the Metricbeat DaemonSet config we are configuring autodiscover to look for pods with the scrape and port annotations, which is exactly what Prometheus does.  
+Let's look at how autodiscover is configured.  Earlier we looked at the guestbook.yaml and that annotations were added to the Redis pods.  One of those annotations set prometheus.io/scrape to true, and the other set the port for the Redis metrics to 9121.  In the Metricbeat DaemonSet config we are configuring autodiscover to look for pods with the scrape and port annotations, which is exactly what Prometheus does.  
 ![Metricbeat autodiscover](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/metricbeat-autodiscover-exporters.png)
-I made this autodiscover more abstract by not specifying port 9121, and substituting the value from the annotation provided by the k8s API so that a single autodiscover config could discover all exporters whether they are for Redis or another technology.
+This autodiscover config is more abstract by not specifying port 9121, and substituting the value from the annotation provided by the k8s API so that a single autodiscover config could discover all exporters whether they are for Redis or another technology (the port numbers for exporters are based on the technology and are published in the [Prometheus wiki](https://github.com/prometheus/prometheus/wiki/Default-port-allocations).
 
 If you are not familiar with the Prometheus autodiscover configuration, here is part of an example.  Notice that it uses the same annotations:
 ![Promethus autodiscover](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/prometheus-autodiscover-snippet.png)
