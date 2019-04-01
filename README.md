@@ -111,8 +111,10 @@ I made this autodiscover more abstract by not specifying port 9121, and substitu
 If you are not familiar with the Prometheus autodiscover configuration, here is part of an example.  Notice that it uses the same annotations:
 ![Promethus autodiscover](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/prometheus-autodiscover-snippet.png)
 
-### Pull metrics from a Prometheus servers
-In this example we will pull self-monitoring metrics from the Prometheus server, and all of the metrics that Prometheus collects from the various systems being monitored.
+### Pull metrics from a Prometheus server
+In this example we will pull:
+ - self-monitoring metrics from the Prometheus server (using the /metrics endpoint)
+ - all of the metrics that Prometheus collects from the various systems being monitored (using the /federate endpoint)
 
 ```
 kubectl create -f metricbeat-prometheus-server.yaml
