@@ -73,6 +73,11 @@ Changes:
 ```
 kubectl create -f guestbook.yaml
 ```
+Let's look at a couple of things in guestbook.yaml:
+ - Annotations on the Redis pods.  These will be used by both Prometheus and Metricbeat to autodiscover the Redis pods:
+![Annotations](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/annotations.png)
+ - Prometheus exporter for Redis sidecar:
+ ![sidecar](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/sidecar.png)
 Verify the external IP is assigned
 
 ```
