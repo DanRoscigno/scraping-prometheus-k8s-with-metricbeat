@@ -89,12 +89,20 @@ Once the external IP address is assigned you can type CTRL-C to stop watching fo
 ### Deploy Metricbeat
 Normally deploying Metricbeat would be a single command, but the goal of this example is to show multiple ways of pulling metrics from Prometheus, so we will do things step by step.
 
-### Pull data from kube-state-metrics.
-We will look specifically at the kubernetes event metricset when we build a visualization.  The event metricset exposes information about scaling deployments (among other things) and the reason for the scaling.
+#### Pull metrics from a Prometheus server and kube-state-metrics
+In this example we will pull:
+ - self-monitoring metrics from the Prometheus server (using the /metrics endpoint)
+ - all of the metrics that Prometheus collects from the various systems being monitored (using the /federate endpoint)
+ - kube-state-metrics information including events and state of nodes, deployments, etc.
 
 ```
-kubectl create -f metricbeat-kube-state-metrics.yaml
+kubectl create -f metricbeat-kube-state-and-prometheus-server.yaml
 ```
+Here is the YAML to set this up:
+![scrape server](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/metricbeat-prometheus-server.png)
+
+We will look specifically at the kubernetes event metricset when we build a visualization.  The event metricset exposes information about scaling deployments (among other things) and the reason for the scaling.
+
 While that deploys, look at the snippet below.  You can see that Metricbeat will connect to port 8080 on the kube-state-metrics pod and collect events and state information about nodes, deployments, etc.
 ![kube-state-metrics YAML](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/kube-state-metrics.png)
 ### Pull data from the Prometheus exporter for Redis.
@@ -111,16 +119,6 @@ I made this autodiscover more abstract by not specifying port 9121, and substitu
 If you are not familiar with the Prometheus autodiscover configuration, here is part of an example.  Notice that it uses the same annotations:
 ![Promethus autodiscover](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/prometheus-autodiscover-snippet.png)
 
-### Pull metrics from a Prometheus server
-In this example we will pull:
- - self-monitoring metrics from the Prometheus server (using the /metrics endpoint)
- - all of the metrics that Prometheus collects from the various systems being monitored (using the /federate endpoint)
-
-```
-kubectl create -f metricbeat-prometheus-server.yaml
-```
-Here is the YAML to set this up:
-![scrape server](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/metricbeat-prometheus-server.png)
 
 ### View in Kibana
 
