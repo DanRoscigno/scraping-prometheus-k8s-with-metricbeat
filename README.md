@@ -44,6 +44,11 @@ kubectl create secret generic dynamic-logging \
 --namespace=kube-system
 ```
 
+### Create the cluster role binding for Metricbeat
+```
+kubectl create -f metricbeat-closterrolebinding.yaml
+```
+
 ### Check to see if kube-state-metrics is running
 ```
 kubectl get pods --namespace=kube-system | grep kube-state
@@ -59,7 +64,11 @@ kubectl get pods --namespace=kube-system | grep kube-state
 ### Deploy the Guestbook example
 Note: This is mostly the default Guestbook example from https://github.com/kubernetes/examples/blob/master/guestbook/all-in-one/guestbook-all-in-one.yaml
 
-I added an ingress that preserves source IPs and added ConfigMaps for the Apache2 and Mod-Status configs so that I could block the /server-status endpoint from outside the internal network (actually apache2.conf is unedited, but I may need it later).  I also added a redis.conf to set the slowlog time criteria.
+Changes:
+ - added annotations so that Prometheus and Metricbeat would autodiscover the Redis pods
+ - added an ingress that preserves source IPs
+ - added ConfigMaps for the Apache2 and Mod-Status configs to block the /server-status endpoint from outside the internal network
+ - added a redis.conf to set the slowlog time criteria
 
 ```
 kubectl create -f guestbook.yaml 
@@ -71,8 +80,34 @@ kubectl get service frontend -w
 ```
 Once the external IP address is assigned you can type CTRL-C to stop watching for changes and get the command prompt back (the -w is "watch for changes")
 
-### Deploy the Elastic Beats
+### Deploy Metricbeat
+Normally deploying Metricbeat would be a single command, but the goal of this example is to show multiple wys of pulling metrics from Prometheus, so we will do things step by step.
+
+First let's pull data from kube-state-metrics. . We will look specifically at the events metricset when we build a visualization.  The events metricset exposes information about scaling deployments (among other things) and the reason for the scaling.
+
 ```
+kubectl create -f metricbeat-kube-state-metrics.yaml
+```
+While that deploys, look at the snippet below.  You can see that Metricbeat will connect to port 8080 on the kube-state-metrics pod and collect events and state information about nodes, deployments, etc.
+```
+  # This module requires `kube-state-metrics` up and running under `kube-system` namespace
+  kubernetes.yml: |-
+    - module: kubernetes
+      metricsets:
+        - state_node
+        - state_deployment
+        - state_replicaset
+        - state_pod
+        - state_container
+        - event
+      period: 10s
+      host: ${NODE_NAME}
+      hosts: ["kube-state-metrics:8080"]
+```
+```
+kubectl create -f metricbeat-kube-state-metrics.yaml
+kubectl create -f metricbeat-prometheus-auto-discover.yaml
+kubectl create -f metricbeat-prometheus-server.yaml
 kubectl create -f filebeat-kubernetes.yaml 
 kubectl create -f metricbeat-kubernetes.yaml 
 kubectl create -f packetbeat-kubernetes.yaml 
