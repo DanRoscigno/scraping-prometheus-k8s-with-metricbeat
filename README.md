@@ -89,20 +89,26 @@ Once the external IP address is assigned you can type CTRL-C to stop watching fo
 ### Deploy Metricbeat
 Normally deploying Metricbeat would be a single command, but the goal of this example is to show multiple wys of pulling metrics from Prometheus, so we will do things step by step.
 
-First let's pull data from kube-state-metrics. . We will look specifically at the events metricset when we build a visualization.  The events metricset exposes information about scaling deployments (among other things) and the reason for the scaling.
+### Pull data from kube-state-metrics.
+We will look specifically at the events metricset when we build a visualization.  The events metricset exposes information about scaling deployments (among other things) and the reason for the scaling.
 
 ```
 kubectl create -f metricbeat-kube-state-metrics.yaml
 ```
 While that deploys, look at the snippet below.  You can see that Metricbeat will connect to port 8080 on the kube-state-metrics pod and collect events and state information about nodes, deployments, etc.
 ![kube-state-metrics YAML](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/kube-state-metrics.png)
+### Pull data from the Prometheus exporter for Redis.
+Up above is a screenshot of the YAML to deploy a sidecar to export Redis metrics.  Metricbeat can pull metrics from Prometheus exporters also.  Deploy a Metricbeat DaemonSet to autodiscover and collect these metrics.
+
+Note: Normally the Metricbeat DaeomonSet would autodiscover and collect all of the metrics about the k8s environment and the apps running in there, this config is simplified to show just one example.
 ```
-kubectl create -f metricbeat-kube-state-metrics.yaml
 kubectl create -f metricbeat-prometheus-auto-discover.yaml
+```
+Let's look at how autodiscover is configured
+![Metricbeat autodiscover](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/metricbeat-autodiscover-exporters.png)
+
+```
 kubectl create -f metricbeat-prometheus-server.yaml
-kubectl create -f filebeat-kubernetes.yaml
-kubectl create -f metricbeat-kubernetes.yaml
-kubectl create -f packetbeat-kubernetes.yaml
 ```
 
 ### View in Kibana
