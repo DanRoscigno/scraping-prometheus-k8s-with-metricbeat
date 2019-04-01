@@ -108,9 +108,14 @@ Let's look at how autodiscover is configured.  Earlier I showed the guestbook.ya
 ![Metricbeat autodiscover](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/metricbeat-autodiscover-exporters.png)
 I made this autodiscover more abstract by not specifying port 9121, and substituting the value from the annotation provided by the k8s API so that a single autodiscover config could discover all exporters whether they are for Redis or another technology.
 
+### Pull metrics from a Prometheus servers
+In this example we will pull self-monitoring metrics from the Prometheus server, and all of the metrics that Prometheus collects from the various systems being monitored.
+
 ```
 kubectl create -f metricbeat-prometheus-server.yaml
 ```
+Here is the YAML to set this up:
+![scrape server](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/metricbeat-prometheus-server.png)
 
 ### View in Kibana
 
