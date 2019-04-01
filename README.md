@@ -78,7 +78,8 @@ Let's look at a couple of things in guestbook.yaml:
 ![Annotations](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/annotations.png)
  - Prometheus exporter for Redis sidecar:
  ![sidecar](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/sidecar.png)
-Verify the external IP is assigned
+
+### Verify the guestbook external IP is assigned
 
 ```
 kubectl get service frontend -w
