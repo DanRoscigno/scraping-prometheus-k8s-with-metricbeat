@@ -46,8 +46,21 @@ data:
       period: 10s
       host: ${NODE_NAME}
       hosts: ["kube-state-metrics:8080"]
+
+    - module: prometheus
+      period: 10s
+      host: ${NODE_NAME}
+      hosts: ["prometheus-service.monitoring.svc.cluster.local:9090"]
+      metrics_path: /metrics
+
+    - module: prometheus
+      period: 10s
+      hosts: ["prometheus-service.monitoring.svc.cluster.local:9090"]
+      metrics_path: '/federate'
+      query:
+        'match[]': '{__name__!=""}'
 ---
-# Deploy singleton instance in the whole cluster for some unique data sources, like kube-state-metrics
+# Deploy singleton instance in the whole cluster for some unique data sources, like kube-state-metrics and prometheus server
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
