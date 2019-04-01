@@ -98,8 +98,11 @@ In this example we will pull:
 ```
 kubectl create -f metricbeat-kube-state-and-prometheus-server.yaml
 ```
-Here is the YAML to connect Metricbeat to the Prometheus server endpoints:
-![scrape server](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/metricbeat-prometheus-server.png)
+Here is the YAML to connect Metricbeat to the Prometheus server /metrics endpoint (self-monitoring):
+![scrape server /metrics endpoint](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/prometheus-self.png)
+
+Here is the YAML to connect Metricbeat to the Prometheus server /federate endpoint:
+![scrape server /federate endpoint](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/prometheus-federate.png)
 
 We will look specifically at the kubernetes event metricset when we build a visualization.  The event metricset exposes information about scaling deployments (among other things) and the reason for the scaling.
 
