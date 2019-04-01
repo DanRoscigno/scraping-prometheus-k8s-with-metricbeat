@@ -104,8 +104,9 @@ Note: Normally the Metricbeat DaeomonSet would autodiscover and collect all of t
 ```
 kubectl create -f metricbeat-prometheus-auto-discover.yaml
 ```
-Let's look at how autodiscover is configured
+Let's look at how autodiscover is configured.  Earlier I showed the guestbook.yaml and that annotations were added to the Redis pods.  One of those annotations set prometheus.io/scrape to true, and the other set the port for the Redis metrics to 9121.  In the Metricbeat DaemonSet config we are configuring autodiscover to look for pods with the scrape and port annotations, which is exactly what Prometheus does.  
 ![Metricbeat autodiscover](https://github.com/DanRoscigno/scraping-prometheus-k8s-with-metricbeat/blob/master/images/metricbeat-autodiscover-exporters.png)
+I made this autodiscover more abstract by not specifying port 9121, and substituting the value from the annotation provided by the k8s API so that a single autodiscover config could discover all exporters whether they are for Redis or another technology.
 
 ```
 kubectl create -f metricbeat-prometheus-server.yaml
